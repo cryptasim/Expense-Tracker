@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     const token = localStorage.getItem("token");
-    console.log("Token from localStorage:", token);
 
     if (!token) {
       setLoading(false);
@@ -26,10 +25,11 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const res = await api.get("/auth/me");
-      console.log("Auth check response:", res.data);
       setUser(res.data);
+      // Refresh token
+      localStorage.setItem("token", token);
     } catch (error) {
-      console.error("Auth check failed:", error.response || error.message);
+      console.error("Auth check failed:", error);
       localStorage.removeItem("token");
       setUser(null);
     } finally {
@@ -42,9 +42,9 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post("/auth/login", credentials);
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
-      navigate("/dashboard");
       return res.data;
     } catch (error) {
+      console.error("Login error:", error);
       throw error;
     }
   };
@@ -61,10 +61,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    navigate("/");
+  const logout = async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.removeItem("token");
+      setUser(null);
+      window.location.href = "/";
+    }
   };
 
   const value = {
