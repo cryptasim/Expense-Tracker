@@ -13,10 +13,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "http://192.168.37.32:3000",
-  "http://192.168.1.105:3000",
-  "http://192.168.111.109:3000",
-  "https://expensetracker-ctan.onrender.com",
+  "https://expensetracker-ctan.onrender.com", // Add your Render frontend URL
 ];
 
 app.use(express.json());
@@ -26,13 +23,15 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow REST tools or mobile apps without origin
-      if (allowedOrigins.indexOf(origin) === -1) {
-        return callback(new Error("CORS policy: Origin not allowed"), false);
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
       }
-      return callback(null, true);
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 

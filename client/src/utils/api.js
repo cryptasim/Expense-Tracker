@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "https://expense-tracker-server-l0az.onrender.com/api",
+  baseURL:
+    process.env.NODE_ENV === "production"
+      ? "https://expense-tracker-server-l0az.onrender.com/api"
+      : "http://localhost:5000/api",
   headers: {
     "Content-Type": "application/json",
   },

@@ -6,17 +6,19 @@ import { authenticateToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Helper to send token in HTTP-only cookie
-const sendToken = (res, token, user) => {
+// Helper to send token in HTTP-only cookie and response
+const sendTokenResponse = (res, token, user) => {
   // Set token in cookie (adjust cookie options as needed)
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production", // only send cookie over HTTPS in prod
-    sameSite: "None",
-    maxAge: 3600000, // 1 hour in milliseconds
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
   });
 
+  // Also send token in response for client storage
   res.json({
+    token,
     user: { id: user._id, name: user.name, email: user.email },
   });
 };
@@ -39,7 +41,7 @@ router.post("/register", async (req, res) => {
       expiresIn: "1h",
     });
 
-    sendToken(res, token, user);
+    sendTokenResponse(res, token, user);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
@@ -62,7 +64,7 @@ router.post("/login", async (req, res) => {
       expiresIn: "1h",
     });
 
-    sendToken(res, token, user);
+    sendTokenResponse(res, token, user);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
