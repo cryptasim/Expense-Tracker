@@ -5,10 +5,10 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true,
+  withCredentials: true, // keep if backend uses cookies, else remove
 });
 
-// Attach token to headers before every request
+// Request interceptor: add token to Authorization header
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -20,7 +20,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: redirect to login if 401
+// Response interceptor: redirect to login if 401 Unauthorized
 api.interceptors.response.use(
   (response) => response,
   (error) => {
