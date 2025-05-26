@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.js
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
@@ -18,6 +17,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     const token = localStorage.getItem("token");
+    console.log("Token from localStorage:", token);
 
     if (!token) {
       setLoading(false);
@@ -25,10 +25,11 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const res = await api.get("/auth/me"); 
+      const res = await api.get("/auth/me");
+      console.log("Auth check response:", res.data);
       setUser(res.data);
     } catch (error) {
-      console.error("Auth check failed:", error);
+      console.error("Auth check failed:", error.response || error.message);
       localStorage.removeItem("token");
       setUser(null);
     } finally {
