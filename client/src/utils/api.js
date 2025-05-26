@@ -41,18 +41,17 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Modified response interceptor to be less aggressive with redirects
+// Modified response interceptor to be less aggressive
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Only redirect on explicit authentication failures
+    // Only handle explicit authentication failures
     if (
       error.response?.status === 401 &&
       error.response?.data?.msg === "Token is not valid"
     ) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/";
+      // Don't redirect immediately on auth errors
+      console.error("Authentication error:", error.response?.data?.msg);
     }
     return Promise.reject(error);
   }
