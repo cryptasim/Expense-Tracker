@@ -108,11 +108,11 @@ const Dashboard = () => {
         {/* Quick Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {[
-            { title: "Total Spent", value: `$ ${totalExpense.toFixed(2)}` },
+            { title: "Total Spent", value: `₹ ${totalExpense.toFixed(2)}` },
             { title: "Transactions", value: expenses.length },
             {
               title: "Average Expense",
-              value: `$ ${(totalExpense / (expenses.length || 1)).toFixed(2)}`,
+              value: `₹ ${(totalExpense / (expenses.length || 1)).toFixed(2)}`,
             },
           ].map((stat) => (
             <div
@@ -174,7 +174,7 @@ const Dashboard = () => {
                   Highest Expense
                 </div>
                 <div className="text-xl font-bold text-gray-900">
-                  $
+                  ₹
                   {Math.max(
                     ...expenses.map((e) => Number(e.amount)),
                     0
@@ -186,7 +186,7 @@ const Dashboard = () => {
                   Lowest Expense
                 </div>
                 <div className="text-xl font-bold text-gray-900">
-                  $
+                  ₹
                   {Math.min(
                     ...(expenses.length
                       ? expenses.map((e) => Number(e.amount))
@@ -214,7 +214,7 @@ const Dashboard = () => {
                   Daily Average
                 </div>
                 <div className="text-xl font-bold text-gray-900">
-                  ${(totalExpense / (expenses.length || 1)).toFixed(2)}
+                  ₹{(totalExpense / (expenses.length || 1)).toFixed(2)}
                 </div>
               </div>
             </div>
@@ -381,7 +381,7 @@ const Dashboard = () => {
                           {expense.category}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          ${expense.amount}
+                          ₹{expense.amount}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {new Date(expense.date).toLocaleDateString()}

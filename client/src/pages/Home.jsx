@@ -53,18 +53,20 @@ const Home = () => {
           {/* Left side content */}
           <div className="space-y-10">
             <div className="relative">
-             <div className="absolute -left-4 top-0 w-1 bg-indigo-600 h-[0px]" />
-              <h1 className="text-5xl md:text-6xl space-y-2">
+              <h1 className="text-5xl md:text-6xl leading-tight">
                 <span className="block text-gray-900 font-light tracking-tight">
                   Your Money.
                 </span>
-                <span className="block text-indigo-600 font-normal">
+                <span className="block text-indigo-600 font-semibold tracking-tight">
                   Your Control.
                 </span>
               </h1>
-              <p className="mt-6 text-gray-600 text-lg leading-relaxed">
-                Join over 10,000 smart individuals who save an average of ₹500
-                monthly using our intelligent expense tracking.
+
+              {/* Description */}
+              <p className="mt-6 text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl">
+                Easily track your daily expenses, visualize your spending with
+                interactive charts, and make changes anytime — all in one
+                simple, intuitive app.
               </p>
             </div>
 
@@ -74,7 +76,7 @@ const Home = () => {
                 <div className="text-sm font-medium text-indigo-600 mb-4">
                   Average Savings
                 </div>
-                <div className="text-4xl font-light text-gray-900">₹500</div>
+                <div className="text-4xl font-light text-gray-900">₹5000</div>
                 <div className="text-sm text-gray-500 mt-1">Monthly</div>
               </div>
 
@@ -174,11 +176,9 @@ const Home = () => {
                 </svg>
                 <div>
                   <div className="text-gray-900 text-sm font-medium">
-                    Secure & Private
+                    100% Free
                   </div>
-                  <div className="text-gray-500 text-xs">
-                    Bank-level security for your data
-                  </div>
+                  <div className="text-gray-500 text-xs">Use it forever!!</div>
                 </div>
               </div>
             </div>
@@ -208,7 +208,7 @@ const Home = () => {
               <p className="text-gray-600">
                 {isLogin
                   ? "Continue your saving journey"
-                  : "Join thousands saving ₹500+ monthly"}
+                  : "Join thousands saving ₹5000+ monthly"}
               </p>
             </div>
 
