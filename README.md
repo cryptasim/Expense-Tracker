@@ -126,7 +126,7 @@ expense-tracker/
 ## Screenshots
 
 <div align="center">
-  <img src="./client/public/app.png" alt="Dashboard" width="100%">
+  <img src="./client/public/Screenshot 2025-05-27 at 4.03.43 AM.png" alt="Dashboard" width="100%">
 </div>
 
 ## Contributing
