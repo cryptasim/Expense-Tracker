@@ -57,14 +57,40 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Update port configuration
 const PORT = process.env.PORT || 8080;
+const server = app
+  .listen(PORT, "0.0.0.0", () => {
+    console.log(`Server is running on port ${PORT}`);
+  })
+  .on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`Port ${PORT} is already in use`);
+    } else {
+      console.error("Server error:", err);
+    }
+    process.exit(1);
+  });
 
+// Add graceful shutdown
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received. Shutting down gracefully...");
+  server.close(() => {
+    console.log("Server closed");
+    mongoose.connection.close(false, () => {
+      console.log("MongoDB connection closed");
+      process.exit(0);
+    });
+  });
+});
+
+// Move mongoose connection after server initialization
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected successfully");
-    app.listen(PORT, "0.0.0.0", () =>
-      console.log(`Server running on port ${PORT}`)
-    );
   })
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
+  });
