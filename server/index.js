@@ -19,24 +19,22 @@ const allowedOrigins = [
   "https://expensetracker-ctan.onrender.com",
 ];
 
-
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Example: In your auth routes, when setting cookies, do something like this:
-// res.cookie('token', token, {
-//   httpOnly: true,
-//   secure: process.env.NODE_ENV === 'production', // set secure in prod only
-//   sameSite: 'lax', // adjust based on your needs
-// });
-
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-}));
-
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // allow REST tools or mobile apps without origin
+      if (allowedOrigins.indexOf(origin) === -1) {
+        return callback(new Error("CORS policy: Origin not allowed"), false);
+      }
+      return callback(null, true);
+    },
+    credentials: true,
+  })
+);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/expenses", expenseRoutes);
@@ -47,7 +45,6 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected successfully");
-    // Listen on all network interfaces so other devices on LAN can connect
     app.listen(PORT, "0.0.0.0", () =>
       console.log(`Server running on port ${PORT}`)
     );
