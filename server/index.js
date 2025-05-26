@@ -40,12 +40,20 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/expenses", expenseRoutes);
 
-// Handle client-side routing
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+// Update static file serving with error handling
+app.use(express.static(path.join(__dirname, "../client/build")));
+
+// Update client-side routing handler
+app.get("/*", (req, res) => {
+  try {
+    res.sendFile(path.join(__dirname, "../client/build/index.html"));
+  } catch (err) {
+    console.error("Error serving static file:", err);
+    res.status(500).send("Error loading application");
+  }
 });
 
-// Error handling middleware
+// Move error handling middleware here
 app.use((err, req, res, next) => {
   console.error("Error:", err);
   res.status(500).json({
@@ -57,18 +65,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Update port configuration
+// Start server before MongoDB connection
 const PORT = process.env.PORT || 8080;
 const server = app
-  .listen(PORT, "0.0.0.0", () => {
-    console.log(`Server is running on port ${PORT}`);
+  .listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
   })
   .on("error", (err) => {
-    if (err.code === "EADDRINUSE") {
-      console.error(`Port ${PORT} is already in use`);
-    } else {
-      console.error("Server error:", err);
-    }
+    console.error("Server error:", err);
     process.exit(1);
   });
 
