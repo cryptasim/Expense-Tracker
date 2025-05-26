@@ -4,14 +4,18 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import path from "path";
+import { fileURLToPath } from "url";
 
 import authRoutes from "./routes/auth.js";
 import expenseRoutes from "./routes/expenses.js";
 
 dotenv.config();
 
+// ES modules fix for __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
-const __dirname = path.resolve();
 
 const allowedOrigins = [
   "http://localhost:3000",
@@ -38,22 +42,28 @@ app.use(
   })
 );
 
-// API routes first
+// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/expenses", expenseRoutes);
 
-// Remove duplicate static serving and fix paths
-app.use(express.static(path.join(__dirname, "client/build")));
+// Serve static files from the React app
+if (process.env.NODE_ENV === "production") {
+  // Serve any static files
+  app.use(express.static(path.join(__dirname, "../client/build")));
 
-// Single catch-all route for client
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client/build", "index.html"), (err) => {
-    if (err) {
-      console.error("Error serving index.html:", err);
-      res.status(500).send("Error loading application");
-    }
+  // Handle React routing, return all requests to React app
+  app.get("*", function (req, res) {
+    res.sendFile(path.join(__dirname, "../client/build/index.html"), (err) => {
+      if (err) {
+        res.status(500).send(err);
+      }
+    });
   });
-});
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running...");
+  });
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -67,34 +77,16 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server before MongoDB connection
+// Start server and connect to MongoDB
 const PORT = process.env.PORT || 8080;
-const server = app
-  .listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  })
-  .on("error", (err) => {
-    console.error("Server error:", err);
-    process.exit(1);
-  });
 
-// Add graceful shutdown
-process.on("SIGTERM", () => {
-  console.log("SIGTERM received. Shutting down gracefully...");
-  server.close(() => {
-    console.log("Server closed");
-    mongoose.connection.close(false, () => {
-      console.log("MongoDB connection closed");
-      process.exit(0);
-    });
-  });
-});
-
-// Move mongoose connection after server initialization
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected successfully");
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);
