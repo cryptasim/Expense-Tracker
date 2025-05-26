@@ -99,4 +99,18 @@ router.get("/me", authenticateToken, async (req, res) => {
   }
 });
 
+// Add verify endpoint before the export
+router.get("/verify", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+    res.json({ valid: true, user });
+  } catch (err) {
+    console.error("Token verification error:", err);
+    res.status(401).json({ msg: "Token is invalid" });
+  }
+});
+
 export default router;
