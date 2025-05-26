@@ -11,6 +11,7 @@ import expenseRoutes from "./routes/expenses.js";
 dotenv.config();
 
 const app = express();
+const __dirname = path.resolve();
 
 const allowedOrigins = [
   "http://localhost:3000",
@@ -37,23 +38,24 @@ app.use(
   })
 );
 
+// API routes first
 app.use("/api/auth", authRoutes);
 app.use("/api/expenses", expenseRoutes);
 
-// Update static file serving with error handling
-app.use(express.static(path.join(__dirname, "../client/build")));
+// Remove duplicate static serving and fix paths
+app.use(express.static(path.join(__dirname, "client/build")));
 
-// Update client-side routing handler
-app.get("/*", (req, res) => {
-  try {
-    res.sendFile(path.join(__dirname, "../client/build/index.html"));
-  } catch (err) {
-    console.error("Error serving static file:", err);
-    res.status(500).send("Error loading application");
-  }
+// Single catch-all route for client
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/build", "index.html"), (err) => {
+    if (err) {
+      console.error("Error serving index.html:", err);
+      res.status(500).send("Error loading application");
+    }
+  });
 });
 
-// Move error handling middleware here
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Error:", err);
   res.status(500).json({
