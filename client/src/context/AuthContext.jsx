@@ -7,16 +7,43 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
+  // Initialize state from localStorage
   const [user, setUser] = useState(() => {
-    // Try to get user from localStorage on initial load
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Check auth status when component mounts
   useEffect(() => {
-    checkAuth();
+    const verifyAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await api.get("/auth/verify");
+        if (res.data.valid) {
+          setUser(res.data.user);
+          // Update stored user data
+          localStorage.setItem("user", JSON.stringify(res.data.user));
+        }
+      } catch (error) {
+        // Only clear on explicit auth errors
+        if (error.response?.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setUser(null);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifyAuth();
   }, []);
 
   // Store user in localStorage whenever it changes
@@ -25,26 +52,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(user));
     }
   }, [user]);
-
-  const checkAuth = async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const res = await api.get("/auth/verify");
-      if (res.data.valid) {
-        setUser(res.data.user);
-      }
-    } catch (error) {
-      console.error("Auth check failed:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const login = async (credentials) => {
     try {
@@ -77,7 +84,7 @@ export const AuthProvider = ({ children }) => {
       console.error("Logout error:", error);
     } finally {
       localStorage.removeItem("token");
-      localStorage.removeItem("user"); // Also remove user data
+      localStorage.removeItem("user");
       setUser(null);
       navigate("/");
     }
