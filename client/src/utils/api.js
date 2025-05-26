@@ -11,15 +11,18 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Check token on initial load
+// Modified checkAuthStatus to be less aggressive
 const checkAuthStatus = async () => {
   const token = localStorage.getItem("token");
   if (token) {
     try {
-      await api.get("/auth/verify"); // Add this endpoint in your backend
+      await api.get("/auth/verify");
     } catch (error) {
-      localStorage.removeItem("token");
-      window.location.href = "/";
+      // Only remove token if it's explicitly invalid
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
     }
   }
 };
@@ -38,11 +41,17 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Modified response interceptor to be less aggressive with redirects
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Only redirect on explicit authentication failures
+    if (
+      error.response?.status === 401 &&
+      error.response?.data?.msg === "Token is not valid"
+    ) {
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
       window.location.href = "/";
     }
     return Promise.reject(error);

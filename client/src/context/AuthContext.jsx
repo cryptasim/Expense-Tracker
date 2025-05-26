@@ -7,13 +7,24 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    // Try to get user from localStorage on initial load
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // Store user in localStorage whenever it changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    }
+  }, [user]);
 
   const checkAuth = async () => {
     const token = localStorage.getItem("token");
@@ -24,14 +35,12 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const res = await api.get("/auth/me");
-      setUser(res.data);
-      // Refresh token
-      localStorage.setItem("token", token);
+      const res = await api.get("/auth/verify");
+      if (res.data.valid) {
+        setUser(res.data.user);
+      }
     } catch (error) {
       console.error("Auth check failed:", error);
-      localStorage.removeItem("token");
-      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -68,8 +77,9 @@ export const AuthProvider = ({ children }) => {
       console.error("Logout error:", error);
     } finally {
       localStorage.removeItem("token");
+      localStorage.removeItem("user"); // Also remove user data
       setUser(null);
-      window.location.href = "/";
+      navigate("/");
     }
   };
 
