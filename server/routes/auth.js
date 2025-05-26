@@ -12,7 +12,7 @@ const sendToken = (res, token, user) => {
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production", // only send cookie over HTTPS in prod
-    sameSite: "strict",
+    sameSite: "None",
     maxAge: 3600000, // 1 hour in milliseconds
   });
 
@@ -74,7 +74,7 @@ router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "None",
   });
   res.json({ message: "Logged out successfully" });
 });
