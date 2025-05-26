@@ -16,6 +16,7 @@ const allowedOrigins = [
   "http://192.168.37.32:3000",
   "http://192.168.1.105:3000",
   "http://192.168.111.109:3000",
+  "https://expensetracker-ctan.onrender.com",
 ];
 
 
