@@ -3,7 +3,7 @@
   <p><strong>Take control of your finances with smart expense tracking</strong></p>
 
 [![Live Demo](https://img.shields.io/badge/demo-live-success.svg)](https://expensetracker-ctan.onrender.com/)
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Open Source]]
 
 </div>
 
