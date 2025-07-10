@@ -3,7 +3,7 @@
   <p><strong>Take control of your finances with smart expense tracking</strong></p>
 
 [![Live Demo](https://img.shields.io/badge/demo-live-success.svg)](https://expensetracker-ctan.onrender.com/)
-[![Open Source]]
+[![Open Source](https://img.shields.io/badge/Open%20Source-Yes-blue.svg)](https://github.com/cryptasim/Expense-Tracker)
 
 </div>
 
